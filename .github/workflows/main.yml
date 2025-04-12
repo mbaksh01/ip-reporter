@@ -2,7 +2,7 @@ name: Node.js CI
 
 permissions:
   contents: read
-  packages: white
+  packages: write
 
 on:
   push:
