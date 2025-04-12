@@ -1,0 +1,37 @@
+name: Node.js CI
+
+permissions:
+  contents: read
+  packages: white
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  buildAndPublish:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Use Node.js 18
+      uses: actions/setup-node@v3
+      with:
+        node-version: 20
+        cache: 'npm'
+    
+    - run: npm ci
+    - run: npm run build --if-present
+    
+    - name: Login to GitHub Container Registry
+      uses: docker/login-action@v3.1.0
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Build and Push Docker Image
+      run: |
+        docker build --tag ghcr.io/mbaksh01/ip-reporter:latest .
+        docker push ghcr.io/mbaksh01/ip-reporter:latest
